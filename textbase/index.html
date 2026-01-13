@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Life in Adventure - Web</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="game-container">
+        <div id="status-bar">
+            <span> HP: <span id="hp">100</span></span>
+            <span> Gold: <span id="gold">15</span></span>
+            <span> Rep: <span id="rep">0</span></span>
+        </div>
+
+        <div id="game-text">
+            <p> Welcome to Life in Adventure </p>
+            <p>Your legend begins now...</p>
+        </div>
+
+        <div id="choices" class="button-grid">
+            <button onclick="startGame()">Begin Journey</button>
+        </div>
+
+        <div id="log-window">
+            <div class="log-header">INVENTORY & LOG</div>
+            <div id="system-log">
+                <div class="log-entry">Waiting for adventure...</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="error-overlay" class="overlay">
+        <div class="vn-container">
+            <div class="name-tag">You</div>
+            <div class="dialog-box">
+                <div class="note">NOTE</div>
+                <div class="dialog-text">
+                    <p id="dialog-message"></p>
+                </div>
+                <div class="next-arrow" onclick="changeText()">❯</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="object.js"></script>
+</body>
+</html>
