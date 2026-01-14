@@ -86,7 +86,7 @@ function startGame() {
     logEl.innerHTML = "";
     
     writeStory("<b>Chapter 1: The Shadows of Oakhaven</b>");
-    writeStory("The sun dips below the jagged horizon, painting the sky in bruises of purple and gold. In the village of Oakhaven, the evening air turns biting and sharp. As you navigate the narrow, cobblestone alleyways near the town square, a desperate cry for help shatters the silence.");
+    writeStory("The sun dips below the jagged horizon, painting the sky in bruises of purple and gold. In the village of North Crest, the evening air turns biting and sharp. As you navigate the narrow, cobblestone alleyways near the town square, a desperate cry for help shatters the silence.");
     writeStory("You round a corner to find three hooded bandits, their rusted daggers glinting in the moonlight. They have cornered an elderly traveler against a crumbling stone wall. The old man clutches a tattered bag to his chest, his hands trembling with fear as the bandits growl demands for his life's savings.");
     
     clearChoices();
@@ -117,7 +117,7 @@ function startGame() {
 function townGate() {
     clearChoices();
     writeStory("<b>Chapter 2: The Iron Gate</b>");
-    writeStory("You reach the Great Southern Gate, a massive structure of iron-reinforced oak that guards the city's inner sanctum. A captain of the guard stands there, leaning on a spear that has seen many battles. He eyes your dusty clothes and travel-worn boots with deep suspicion.");
+    writeStory("You reach the Great Northern Gate, a massive structure of iron-reinforced oak that guards the city's inner sanctum. A captain of the guard stands there, leaning on a spear that has seen many battles. He eyes your dusty clothes and travel-worn boots with deep suspicion.");
     writeStory("'The city is under high alert,' he grunts, spitting on the ground. 'Nobody enters without paying the toll. Five gold coins, or you can find somewhere else to sleep tonight. No exceptions.'");
     
     addChoice("Hand over the 5 gold coins", () => {
@@ -336,7 +336,7 @@ function ending() {
     
     let message = "";
     if (player.reputation >= 100) {
-        message = "You returned to Oakhaven not as a conqueror, but as a sage. You spent the rest of your days teaching others that the greatest treasures are found in the heart. Statues were built in your honor, and your name became a prayer for travelers in the dark.";
+        message = "You returned to North Crest not as a conqueror, but as a sage. You spent the rest of your days teaching others that the greatest treasures are found in the heart. Statues were built in your honor, and your name became a prayer for travelers in the dark.";
     } else if (player.gold > 100) {
         message = "You returned home with gold falling out of your pockets. You bought the finest mansion in the city and spent your days in luxury. Yet, sometimes at night, you hear the wind howling like a dragon, and you wonder if the price you paid for your gold was too high.";
     } else {
