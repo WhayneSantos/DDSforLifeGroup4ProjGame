@@ -5,22 +5,20 @@ body {
     font-family: 'Georgia', serif;
     display: flex;
     justify-content: center;
-    padding: 20px;
+    align-items: center;
     min-height: 100vh;
     margin: 0;
+    overflow: hidden;
 }
 
 .game-container {
-    width: 100%;
+    width: 90%;
     max-width: 500px;
     background: #161614;
     padding: 30px;
-    border-radius: 2px;
     border: 1px solid #3d3a33;
-    outline: 4px solid #161614; 
     box-shadow: 0 20px 50px rgba(0,0,0,0.8);
-    display: flex;
-    flex-direction: column;
+    position: relative;
 }
 
 #status-bar {
@@ -30,46 +28,75 @@ body {
     border-bottom: 1px double #5c5548;
     color: #a68d60;
     font-variant: small-caps;
-    letter-spacing: 1px;
     font-weight: bold;
 }
 
 #game-text {
-    height: 300px;
+    height: 350px;
     overflow-y: auto;
     margin: 20px 0;
-    font-size: 1.1rem;
-    line-height: 1.7;
-    color: #e3dac9;
     padding-right: 10px;
-    /* This creates the atmospheric fade */
+    /* Create a fade effect at top and bottom */
     mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
 }
 
-/* --- THE HIGHLIGHT ANIMATION --- */
-@keyframes storyFlash {
-    0% {
-        background-color: rgba(166, 141, 96, 0.2);
-        border-left: 4px solid #a68d60;
-        padding-left: 10px;
-        color: #fff;
-    }
-    100% {
-        background-color: transparent;
-        border-left: 4px solid transparent;
-        padding-left: 0px;
-    }
+#game-text p {
+    margin-bottom: 20px;
+    transition: all 0.8s ease;
+    line-height: 1.6;
 }
 
+/* TEXT STATES */
 .new-story-line {
-    animation: storyFlash 1.2s cubic-bezier(0.215, 0.61, 0.355, 1);
+    opacity: 1;
+    color: #f2e1c2;
+    border-left: 3px solid #a68d60;
+    padding-left: 15px;
+    animation: fadeInSlide 0.6s ease-out forwards;
 }
 
-.button-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+.old-story-line {
+    opacity: 0.3;
+    filter: brightness(0.6);
+    border-left: 3px solid transparent;
+    padding-left: 5px;
 }
+
+@keyframes fadeInSlide {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* CHAPTER POPUP */
+#chapter-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+    pointer-events: none;
+}
+
+#chapter-title-text {
+    font-size: 2.2rem;
+    color: #f2e1c2;
+    text-shadow: 0 0 20px rgba(166, 141, 96, 0.8);
+    letter-spacing: 5px;
+    transform: scale(0.8);
+    transition: transform 1s ease;
+}
+
+#chapter-overlay.chapter-active { opacity: 1; }
+#chapter-overlay.chapter-active #chapter-title-text { transform: scale(1.1); }
+.chapter-hidden { display: none !important; }
+
+/* BUTTONS */
+.button-grid { display: flex; flex-direction: column; gap: 10px; }
 
 button {
     background: #252521;
@@ -79,51 +106,22 @@ button {
     cursor: pointer;
     text-align: left;
     font-family: 'Georgia', serif;
-    font-size: 1rem;
     transition: all 0.3s ease;
-    position: relative;
+    animation: fadeInDown 0.5s ease-out;
 }
 
 button:hover {
     background: #2d2d27;
     color: #f2e1c2;
-    border-color: #8c7851;
-    padding-left: 30px;
+    padding-left: 20px;
+    border-color: #a68d60;
 }
 
-button::before {
-    content: '▶';
-    position: absolute;
-    left: 10px;
-    opacity: 0;
-    transition: 0.3s;
+@keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-button:hover::before {
-    opacity: 1;
-}
-
-#log-window {
-    margin-top: 25px;
-    background: #0a0a09;
-    border: 1px solid #262420;
-}
-
-.log-header {
-    background: #1c1c1a;
-    font-size: 0.65rem;
-    padding: 4px 10px;
-    color: #5c5548;
-    text-transform: uppercase;
-}
-
-#system-log {
-    height: 60px;
-    padding: 10px;
-    font-size: 0.8rem;
-    color: #8c8578;
-    font-family: 'Courier New', monospace;
-    overflow-y: auto;
-}
-
-.log-entry { margin-bottom: 4px; }
+#log-window { margin-top: 20px; background: #0a0a09; border: 1px solid #262420; }
+.log-header { padding: 5px 10px; background: #1c1c1a; color: #5c5548; font-size: 0.7rem; }
+#system-log { height: 60px; padding: 10px; overflow-y: auto; color: #8c8578; font-size: 0.8rem; }

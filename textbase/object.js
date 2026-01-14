@@ -1,13 +1,4 @@
-let player = {
-    name: "Hero",
-    health: 100,
-    gold: 15,
-    reputation: 0,
-    inventory: [],
-    hasMap: false,
-    day: 1
-};
-
+let player = { name: "Hero", health: 100, gold: 15, reputation: 0, inventory: [], hasMap: false, day: 1 };
 let dragonHP = 150;
 
 const textEl = document.getElementById('game-text');
@@ -16,6 +7,8 @@ const logEl = document.getElementById('system-log');
 const hpEl = document.getElementById('hp');
 const goldEl = document.getElementById('gold');
 const repEl = document.getElementById('rep');
+const overlayEl = document.getElementById('chapter-overlay');
+const titleTextEl = document.getElementById('chapter-title-text');
 
 function updateUI() {
     hpEl.innerText = player.health;
@@ -23,46 +16,246 @@ function updateUI() {
     repEl.innerText = player.reputation;
 }
 
+function showChapter(title) {
+    titleTextEl.innerText = title;
+    overlayEl.classList.remove('chapter-hidden');
+    setTimeout(() => overlayEl.classList.add('chapter-active'), 50);
+    setTimeout(() => {
+        overlayEl.classList.remove('chapter-active');
+        setTimeout(() => overlayEl.classList.add('chapter-hidden'), 800);
+    }, 2200);
+}
+
 function writeStory(text) {
     const p = document.createElement('p');
-    p.style.marginBottom = "15px";
     p.innerHTML = text;
-    
-    // Add the dramatic highlight class
     p.classList.add('new-story-line');
-    
     textEl.appendChild(p);
-    
-    // Smooth scroll
-    textEl.scrollTo({
-        top: textEl.scrollHeight,
-        behavior: 'smooth'
-    });
-
-    // Clean up class after animation
-    setTimeout(() => { p.classList.remove('new-story-line'); }, 1200);
+    textEl.scrollTo({ top: textEl.scrollHeight, behavior: 'smooth' });
 }
 
 function writeLog(msg) {
     const entry = document.createElement('div');
-    entry.className = "log-entry";
     entry.innerText = `> ${msg}`;
     logEl.appendChild(entry);
     logEl.scrollTop = logEl.scrollHeight;
 }
 
-function clearChoices() {
-    choiceEl.innerHTML = "";
-}
+function clearChoices() { choiceEl.innerHTML = ""; }
 
 function addChoice(text, action) {
     const btn = document.createElement('button');
     btn.innerText = text;
     btn.onclick = () => {
+        // Dim all current lines because a choice was made
+        const activeEntries = textEl.querySelectorAll('.new-story-line');
+        activeEntries.forEach(entry => {
+            entry.classList.remove('new-story-line');
+            entry.classList.add('old-story-line');
+        });
+
         player.day++;
-        action(btn);
+        action();
     };
     choiceEl.appendChild(btn);
+}
+
+// 1. Initial State
+function initGame() {
+    clearChoices();
+    textEl.innerHTML = "<p class='new-story-line' style='text-align:center;'>Welcome to Life in Adventure.<br>Your legend begins with a single step.</p>";
+    addChoice("Begin Journey", startGame);
+}
+
+// 2. Chapter 1
+function startGame() {
+    player = { name: "Hero", health: 100, gold: 15, reputation: 0, inventory: [], hasMap: false, day: 1 };
+    dragonHP = 150;
+    textEl.innerHTML = "";
+    logEl.innerHTML = "";
+    updateUI();
+    
+    showChapter("Chapter 1: The Shadows");
+    
+    writeStory("<b>Chapter 1: The Shadows of Oakhaven</b>");
+    writeStory("The sun dips below the jagged horizon, painting the sky in bruises of purple and gold. In the village of North Crest, the evening air turns biting and sharp. As you navigate the narrow, cobblestone alleyways near the town square, a desperate cry for help shatters the silence.");
+    writeStory("You round a corner to find three hooded bandits, their rusted daggers glinting in the moonlight. They have cornered an elderly traveler against a crumbling stone wall. The old man clutches a tattered bag to his chest, his hands trembling with fear as the bandits growl demands for his life's savings.");
+    
+    clearChoices();
+    addChoice("Intervene: 'Leave him be!'", () => {
+        player.reputation += 10; player.health -= 15; player.hasMap = true;
+        player.inventory.push("Old Map");
+        writeStory("With a roar of defiance, you throw yourself between the old man and the thieves. The struggle is brief but violent; a jagged blade catches your forearm, drawing blood, but your ferocity startles them. Seeing a town guard's torch flickering in the distance, the bandits curse and vanish into the shadows.");
+        writeStory("The traveler breathes a sigh of relief. 'You have the heart of a lion,' he whispers, pressing a yellowed, wax-sealed parchment into your hand. 'This map leads to the Frozen Peak. May it guide you to the fortune you deserve.'");
+        writeLog("Saved the traveler. HP -15, Received Old Map.");
+        updateUI(); townGate();
+    });
+    addChoice("Observe from the darkness", () => {
+        writeStory("You press your back against the cold brick of a nearby building, holding your breath. You watch in silence as the bandits roughly shove the old man to the ground, snatching his bag and disappearing into the night. You remain physically unharmed, but the old man's muffled sobs linger in your ears, a heavy weight settling in your chest.");
+        writeLog("Chose the path of caution.");
+        townGate();
+    });
+    addChoice("Join the bandits", () => {
+        player.reputation -= 20; player.gold += 15;
+        writeStory("Deciding that gold is worth more than a clear conscience, you step into the light with a predatory grin. The bandits are surprised, but they welcome your help in shaking down the traveler. After stripping the man of his coins, they toss you a small pouch as your cut.");
+        writeLog("Aided the thieves. Gold +15, Rep -20.");
+        updateUI(); townGate();
+    });
+}
+
+// 3. Chapter 2
+function townGate() {
+    clearChoices();
+    showChapter("Chapter 2: The Iron Gate");
+    writeStory("<b>Chapter 2: The Iron Gate</b>");
+    writeStory("You reach the Great Northern Gate, a massive structure of iron-reinforced oak that guards the city's inner sanctum. A captain of the guard stands there, leaning on a spear that has seen many battles. He eyes your dusty clothes and travel-worn boots with deep suspicion.");
+    writeStory("'The city is under high alert,' he grunts, spitting on the ground. 'Nobody enters without paying the toll. Five gold coins, or you can find somewhere else to sleep tonight. No exceptions.'");
+    
+    addChoice("Hand over 5 gold", () => {
+        if (player.gold >= 5) {
+            player.gold -= 5; updateUI();
+            writeStory("You count out five glinting coins and drop them into the guard's outstretched palm. He bites one to check its purity, then signals his men to winch the heavy gate open.");
+            market();
+        } else { writeLog("Pockets are too light."); }
+    });
+
+    addChoice("Slink through the sewers (-25 HP)", () => {
+        player.health -= 25; updateUI();
+        if (player.health <= 0) return gameOver("The toxic fumes of the under-city took your life.");
+        writeStory("Refusing to waste your coin, you find a rusted iron grate leading to the city's underbelly. The smell is an assault on your senses. You spend hours wading through filth, eventually emerging from a manhole inside the city walls.");
+        market();
+    });
+
+    if (player.reputation >= 10) {
+        addChoice("Reason with the Captain", () => {
+            writeStory("The guard captain pauses, squinting at your face. 'Wait... I know that look. Word reached us that you stood up to those cowards in the square earlier. Keep your gold, traveler. Welcome to the city.'");
+            market();
+        });
+    }
+}
+
+// 4. Chapter 3
+function market() {
+    clearChoices();
+    showChapter("Chapter 3: The Market");
+    writeStory("<b>Chapter 3: The Gilded Market</b>");
+    writeStory("The interior of the city is a whirlwind of color and sound. You find yourself in 'The Adventurer's Rest,' a corner of the market where the air smells of coal smoke and alchemical herbs.");
+    
+    if (!player.inventory.includes("Steel Sword")) {
+        addChoice("Purchase Steel Sword (10 Gold)", () => {
+            if (player.gold >= 10) {
+                player.gold -= 10; player.inventory.push("Steel Sword");
+                updateUI(); writeStory("The blacksmith hands you a blade of fine Oakhaven steel.");
+                market(); 
+            } else { writeLog("Not enough gold."); }
+        });
+    }
+
+    addChoice("Drink Healing Elixir (5 Gold)", () => {
+        if (player.gold >= 5) {
+            player.gold -= 5; player.health = 100;
+            writeStory("You purchase a vial of 'Crimson Essence.' Your wounds knit shut instantly.");
+            updateUI(); market();
+        } else { writeLog("Not enough gold."); }
+    });
+
+    addChoice("Depart for the Woods", forest);
+}
+
+// 5. Chapter 4
+function forest() {
+    clearChoices();
+    showChapter("Chapter 4: Whispering Woods");
+    writeStory("<b>Chapter 4: The Whispering Woods</b>");
+    writeStory("A Shadow Stalker—a beast made of living darkness—materializes from the mist.");
+    
+    if (player.hasMap) {
+        addChoice("Consult the Traveler's Map", () => {
+            writeStory("You follow a hidden hunter's path marked on the map, bypassing the beast.");
+            mountainPass();
+        });
+    }
+    addChoice("Engage the Shadow Stalker", () => {
+        if (player.inventory.includes("Steel Sword")) {
+            writeStory("You slay the monster with your steel blade.");
+            mountainPass();
+        } else {
+            player.health -= 60; updateUI();
+            if (player.health <= 0) return gameOver("The Shadow Stalker claimed your life.");
+            writeStory("You barely escape with your life, heavily wounded.");
+            mountainPass();
+        }
+    });
+}
+
+function mountainPass() {
+    clearChoices();
+    writeStory("<b>Chapter 5: The Cold Mountain</b>");
+    writeStory("You are climbing up a very high mountain now. There is snow on the ground and the wind is blowing very hard. You find a small cave where you can hide from the cold wind for a little while.");
+    
+    addChoice("Rest and light a fire", (btn) => {
+        player.health = Math.min(100, player.health + 15);
+        writeStory("You find some wood and light a small fire. The warm air makes you feel better and your health goes up. After you rest, the fire goes out and the cave gets cold again.");
+        writeLog("HP +15. Fire went out.");
+        updateUI(); btn.disabled = true; btn.innerText = "Fire is Out";
+    });
+
+    addChoice("Keep climbing up", mountain);
+}
+
+// 6. Chapter 5 & Dragon
+function mountainPass() {
+    clearChoices();
+    showChapter("Chapter 6: Frozen Peak");
+    writeStory("<b>Chapter 5: The Ascent of Sorrows</b>");
+    writeStory("You reach the summit. At the center of a hoard rests the **Dragon Soul Gem**.");
+
+    addChoice("Fill packs with gold", () => { player.gold += 150; player.reputation -= 15; dragonEncounter(); });
+    addChoice("Claim the Magic Gem", () => { player.inventory.push("Dragon Soul Gem"); dragonEncounter(); });
+    addChoice("Leave the hoard untouched", () => { player.reputation += 100; dragonEncounter(); });
+}
+
+function dragonEncounter() {
+    clearChoices();
+    dragonHP = 150;
+    if (player.reputation >= 100) {
+        writeStory("The Frost Dragon realizes you took nothing. 'One who seeks not for self is worthy.'");
+        addChoice("Speak with the Ancient One", ending);
+    } else {
+        writeStory("The Dragon bellows: 'Thief!'");
+        addChoice("Fight!", dragonBattle);
+    }
+}
+
+function dragonBattle() {
+    clearChoices();
+    updateUI();
+    if (player.health <= 0) return gameOver("The dragon shattered your body.");
+    if (dragonHP <= 0) return ending();
+    writeStory(`Dragon HP: ${dragonHP} | Your HP: ${player.health}`);
+    if (player.inventory.includes("Steel Sword")) {
+        addChoice("Thrust with Steel Sword", () => { dragonHP -= 25; writeStory("You strike deep."); dragonCounterAttack(); });
+    }
+    addChoice("Brace for Impact", () => dragonCounterAttack(true));
+}
+
+function dragonCounterAttack(isDefending = false) {
+    let dDmg = isDefending ? 5 : 20;
+    player.health -= dDmg;
+    writeStory(`The dragon sweeps its tail! You take ${dDmg} damage.`);
+    updateUI();
+    if (player.health > 0) addChoice("Continue Fight", dragonBattle);
+    else gameOver("You were turned to ice.");
+}
+
+// Endings
+function ending() {
+    clearChoices();
+    showChapter("The Legend Ends");
+    writeStory("<b>The Long Road Home</b>");
+    let msg = player.reputation >= 100 ? "You returned as a sage." : "You returned home wealthy but haunted.";
+    writeStory(msg);
+    addChoice("Begin a New Legend", startGame);
 }
 
 function gameOver(reason) {
@@ -71,207 +264,7 @@ function gameOver(reason) {
     textEl.innerHTML = ""; 
     writeStory("<h1 style='color: #8b0000; text-align: center;'>GAME OVER</h1>");
     writeStory(`<p style='text-align: center;'>${reason}</p>`);
-    writeStory("<hr style='border: 0; border-top: 1px solid #333;'>");
-    writeStory("<b>Your Final Stats:</b>");
-    writeStory(`* Days Survived: ${player.day}`);
-    writeStory(`* Gold Collected: ${player.gold}`);
-    writeStory(`* Reputation: ${player.reputation}`);
     addChoice("Begin a New Legend", startGame);
 }
 
-// --- GAME SCENES ---
-
-function startGame() {
-    player = { name: "Hero", health: 100, gold: 15, reputation: 0, inventory: [], hasMap: false, day: 1 };
-    dragonHP = 150;
-    updateUI();
-    textEl.innerHTML = "";
-    logEl.innerHTML = "";
-    
-    writeStory("<b>Chapter 1: The Shadows of Oakhaven</b>");
-    writeStory("The sun dips below the jagged horizon. In the village of North Crest, you find three hooded bandits cornering an elderly traveler. Their daggers glint in the dim light.");
-    
-    clearChoices();
-    addChoice("Intervene: 'Leave him be!'", () => {
-        player.reputation += 10; player.health -= 15; player.hasMap = true;
-        player.inventory.push("Old Map");
-        writeStory("You drive the bandits off but take a shallow cut. The man gives you an <b>Old Map</b> in thanks.");
-        writeLog("Saved the traveler. HP -15, Received Map.");
-        updateUI(); townGate();
-    });
-    
-    addChoice("Observe from the darkness", () => {
-        writeStory("You watch as they rob the man. You remain safe, but the memory haunts you.");
-        writeLog("Chose the path of caution.");
-        townGate();
-    });
-    
-    addChoice("Join the bandits", () => {
-        player.reputation -= 20; player.gold += 15;
-        writeStory("You take a cut of the old man's gold. The villagers watch you with disgust.");
-        writeLog("Aided the thieves. Gold +15, Rep -20.");
-        updateUI(); townGate();
-    });
-}
-
-function townGate() {
-    clearChoices();
-    writeStory("<b>Chapter 2: The Iron Gate</b>");
-    writeStory("The Captain of the Guard demands a 5 gold toll to enter the city.");
-    
-    addChoice("Pay 5 gold coins", () => {
-        if (player.gold >= 5) { 
-            player.gold -= 5; 
-            updateUI(); market(); 
-        } else { writeLog("Pockets are too light."); }
-    });
-    
-    addChoice("Slink through the sewers (-25 HP)", () => {
-        player.health -= 25; 
-        updateUI();
-        if (player.health <= 0) return gameOver("The toxic fumes took your life.");
-        writeStory("You emerge inside the walls covered in filth and shivering.");
-        market();
-    });
-    
-    if (player.reputation >= 10) {
-        addChoice("Reason with the Captain", () => {
-            writeStory("'I heard of your bravery in the square,' he says. 'Keep your gold.'");
-            market();
-        });
-    }
-}
-
-function market() {
-    clearChoices();
-    writeStory("<b>Chapter 3: The Gilded Market</b>");
-    writeStory("A blacksmith and an alchemist offer their wares before your journey into the woods.");
-    
-    if (!player.inventory.includes("Steel Sword")) {
-        addChoice("Purchase Steel Sword (10 Gold)", (btn) => {
-            if (player.gold >= 10) {
-                player.gold -= 10; player.inventory.push("Steel Sword");
-                updateUI(); btn.disabled = true; btn.innerText = "Sword Equipped";
-            }
-        });
-    }
-    
-    addChoice("Drink Healing Elixir (5 Gold)", (btn) => {
-        if (player.gold >= 5) {
-            player.gold -= 5; player.health = 100;
-            updateUI(); btn.disabled = true; btn.innerText = "Health Restored";
-        }
-    });
-    
-    addChoice("Depart for the Whispering Woods", forest);
-}
-
-function forest() {
-    clearChoices();
-    writeStory("<b>Chapter 4: The Whispering Woods</b>");
-    writeStory("A Shadow Stalker materializes from the mist, blocking your path.");
-    
-    if (player.hasMap) {
-        addChoice("Consult the Traveler's Map", () => {
-            writeLog("Evaded the beast using the map.");
-            mountainPass();
-        });
-    }
-    
-    addChoice("Engage the Shadow Stalker", () => {
-        if (player.inventory.includes("Steel Sword")) {
-            player.gold += 25; 
-            writeStory("Your steel carves through the smoke. You find gold in its wake.");
-            updateUI(); mountainPass();
-        } else {
-            player.health -= 60; updateUI();
-            if (player.health <= 0) return gameOver("The Stalker's claws found your heart.");
-            writeStory("You escaped, but you are badly wounded.");
-            mountainPass();
-        }
-    });
-}
-
-function mountainPass() {
-    clearChoices();
-    writeStory("<b>Chapter 5: The Ascent of Sorrows</b>");
-    addChoice("Kindle a fire and rest (+15 HP)", (btn) => {
-        player.health = Math.min(100, player.health + 15);
-        updateUI(); btn.disabled = true;
-    });
-    addChoice("Push to the summit", mountain);
-}
-
-function mountain() {
-    clearChoices();
-    writeStory("<b>Chapter 6: The Hoard</b>");
-    writeStory("You stand before a mountain of gold and the pulsing <b>Dragon Soul Gem</b>.");
-    
-    addChoice("Fill packs with gold (+150 Gold)", () => { 
-        player.gold += 150; player.reputation -= 15; 
-        updateUI(); dragonEncounter(); 
-    });
-    addChoice("Claim the Magic Gem", () => { 
-        player.inventory.push("Dragon Soul Gem"); 
-        dragonEncounter(); 
-    });
-    addChoice("Leave it untouched", () => { 
-        player.reputation += 100; updateUI(); 
-        dragonEncounter(); 
-    });
-}
-
-function dragonEncounter() {
-    clearChoices();
-    if (player.reputation >= 100) {
-        writeStory("The Frost Dragon respects your restraint and lets you pass.");
-        ending();
-    } else {
-        writeStory("The Dragon awakes with a roar! 'Thief!'");
-        addChoice("Fight!", dragonBattle);
-    }
-}
-
-function dragonBattle() {
-    clearChoices();
-    if (player.health <= 0) return gameOver("The dragon shattered your body.");
-    if (dragonHP <= 0) return ending();
-
-    writeStory(`Dragon: ${dragonHP} HP | Your HP: ${player.health}`);
-
-    if (player.inventory.includes("Steel Sword")) {
-        addChoice("Sword Thrust", () => {
-            let dmg = 25; dragonHP -= dmg;
-            writeStory(`You deal ${dmg} damage.`);
-            dragonCounterAttack();
-        });
-    }
-
-    if (player.inventory.includes("Dragon Soul Gem")) {
-        addChoice("Unleash the Gem", () => {
-            dragonHP -= 60;
-            writeStory("The gem blasts the dragon for 60 damage!");
-            dragonCounterAttack();
-        });
-    }
-
-    addChoice("Defend", () => dragonCounterAttack(true));
-}
-
-function dragonCounterAttack(isDefending = false) {
-    let dDmg = isDefending ? 5 : 20;
-    player.health -= dDmg;
-    updateUI();
-    if (player.health > 0) addChoice("Continue Fight", dragonBattle);
-    else gameOver("The frost consumed you.");
-}
-
-function ending() {
-    clearChoices();
-    let msg = player.reputation >= 100 ? "You are a legend of honor." : "You are rich but haunted.";
-    writeStory(msg);
-    addChoice("Play Again", startGame);
-}
-
-// Launch Game
-startGame();
+initGame();
