@@ -1,65 +1,86 @@
 body {
     background-color: #0d0d0b;
-    /* Subtle stone-like texture using a dark gradient */
     background: radial-gradient(circle, #1a1a17 0%, #080807 100%);
-    color: #d1c7b7; /* Muted parchment white */
-    font-family: 'Georgia', serif; /* Classic book-style font */
+    color: #d1c7b7;
+    font-family: 'Georgia', serif;
     display: flex;
     justify-content: center;
     padding: 20px;
     min-height: 100vh;
+    margin: 0;
 }
 
 .game-container {
     width: 100%;
-    height: 50%;
     max-width: 500px;
     background: #161614;
     padding: 30px;
-    border-radius: 2px; /* Very slight rounding for a hand-crafted look */
-    /* Double border gives a "framed" feel */
+    border-radius: 2px;
     border: 1px solid #3d3a33;
     outline: 4px solid #161614; 
     box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+    display: flex;
+    flex-direction: column;
 }
 
 #status-bar {
     display: flex;
     justify-content: space-around;
     padding-bottom: 15px;
-    border-bottom: 1px double #5c5548; /* Double line for class */
-    color: #a68d60; /* Tarnished brass/gold */
+    border-bottom: 1px double #5c5548;
+    color: #a68d60;
     font-variant: small-caps;
     letter-spacing: 1px;
+    font-weight: bold;
 }
 
 #game-text {
-    height: 250px;
+    height: 300px;
     overflow-y: auto;
-    margin: 25px 0;
-    font-size: 1.2rem;
-    line-height: 1.8;
+    margin: 20px 0;
+    font-size: 1.1rem;
+    line-height: 1.7;
     color: #e3dac9;
-    /* Fade effect at the top and bottom of text */
-    mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent);
+    padding-right: 10px;
+    /* This creates the atmospheric fade */
+    mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+}
+
+/* --- THE HIGHLIGHT ANIMATION --- */
+@keyframes storyFlash {
+    0% {
+        background-color: rgba(166, 141, 96, 0.2);
+        border-left: 4px solid #a68d60;
+        padding-left: 10px;
+        color: #fff;
+    }
+    100% {
+        background-color: transparent;
+        border-left: 4px solid transparent;
+        padding-left: 0px;
+    }
+}
+
+.new-story-line {
+    animation: storyFlash 1.2s cubic-bezier(0.215, 0.61, 0.355, 1);
 }
 
 .button-grid {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 12px;
 }
 
 button {
     background: #252521;
     color: #bfae91;
     border: 1px solid #454035;
-    padding: 15px;
-    border-radius: 0; /* Sharp corners feel more rugged */
+    padding: 14px;
     cursor: pointer;
     text-align: left;
     font-family: 'Georgia', serif;
-    transition: all 0.4s ease;
+    font-size: 1rem;
+    transition: all 0.3s ease;
     position: relative;
 }
 
@@ -67,7 +88,7 @@ button:hover {
     background: #2d2d27;
     color: #f2e1c2;
     border-color: #8c7851;
-    padding-left: 25px; /* "Slide" effect on hover */
+    padding-left: 30px;
 }
 
 button::before {
@@ -83,24 +104,26 @@ button:hover::before {
 }
 
 #log-window {
-    margin-top: 30px;
+    margin-top: 25px;
     background: #0a0a09;
     border: 1px solid #262420;
 }
 
 .log-header {
     background: #1c1c1a;
-    font-size: 0.7rem;
-    padding: 6px 12px;
+    font-size: 0.65rem;
+    padding: 4px 10px;
     color: #5c5548;
     text-transform: uppercase;
 }
 
 #system-log {
-    height: 70px;
-    padding: 12px;
-    font-size: 0.85rem;
-    color: #8c8578; /* Muted, non-glow text */
+    height: 60px;
+    padding: 10px;
+    font-size: 0.8rem;
+    color: #8c8578;
     font-family: 'Courier New', monospace;
-    line-height: 1.4;
+    overflow-y: auto;
 }
+
+.log-entry { margin-bottom: 4px; }
