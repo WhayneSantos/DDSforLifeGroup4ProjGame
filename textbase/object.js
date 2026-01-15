@@ -100,11 +100,28 @@ function startGame() {
         updateUI(); addContinue(townGate);
     });
 
-    addChoice("Observe from the darkness", () => {
-        writeLog("Stayed in the shadows.");
-        writeStory("You press your back against the cold brick, holding your breath. You watch in silence as the bandits roughly shove the old man to the ground, snatching his bag. You remain unharmed, but his muffled sobs linger in your ears.");
-        addContinue(townGate);
-    });
+addChoice("Observe from the darkness", () => {
+    writeLog("Stayed in the shadows.");
+    writeStory("You press your back against the cold brick, holding your breath. You watch in silence as the bandits roughly shove the old man to the ground, snatching his bag.");
+    
+
+    writeStory("<br>As the bandits turn to flee, the leader stops. He sniffs the air and looks directly at your hiding spot. 'Well, well,' he sneers, 'a witness who likes to watch.'");
+    writeStory("They don't attack, but they mock your cowardice. One tosses a heavy, blood-stained coin at your feet. 'A gift for staying quiet, mouse.'");
+    
+    player.gold += 5;
+    player.reputation -= 10;
+    updateUI();
+    
+    writeLog("Gained 5 Blood Money", "gain");
+    writeLog("Reputation decreased (Cowardice)", "loss");
+    
+    writeStory("The bandits vanish. You find a <b>Scrap of Parchment</b> the old man dropped—it’s a piece of the map, but the rest is gone with the thieves.");
+    
+    player.hasMap = true;
+    player.inventory.push("Tattered Map Piece");
+    
+    addContinue(townGate);
+});
 
     addChoice("Opportunist: Help the thugs.", () => {
         player.reputation -= 20; player.gold += 15;
@@ -574,5 +591,4 @@ function gameOver(reason) {
 initGame();
 
 //fix function forest add barehand scene
-//add high dodge chance when the dragon do a special attack
-//add a twist for the 'observe in the shadow' choice
+// //add a twist for the 'observe in the shadow' choice
