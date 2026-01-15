@@ -416,24 +416,44 @@ function frozenPeak() {
     writeStory("You reach the summit. At the center of a hoard rests the *Dragon Soul Gem*, pulsing with power.");
 
     addChoice("Fill packs with gold", () => { 
-        player.gold += 150; player.reputation -= 15; updateUI(); 
+        player.gold += 150; 
+        player.reputation -= 15; 
+        updateUI(); 
         writeLog("Stole Dragon Gold (+150)", "gain");
-        writeLog("Reputation loss for theft", "loss");
-        writeStory("You greedily stuff your bags with gold coins. The clinking of metal echoes through the cavern.");
-        addContinue(dragonEncounter); 
+        writeStory("You greedily stuff your bags with gold coins.");
+        dragonEncounter();
     });
+
     addChoice("Claim the Magic Gem", () => { 
         player.inventory.push("Dragon Soul Gem"); 
         writeLog("Took Dragon Soul Gem", "gain");
         writeStory("You lift the Gem. It feels warm, vibrating with a life of its own.");
-        addContinue(dragonEncounter); 
+        
+        setTimeout(() => {
+            dragonEncounter(); 
+        }, 100);
     });
+
     addChoice("Leave the hoard untouched", () => { 
-        player.reputation += 100; updateUI(); 
+        player.reputation += 100; 
+        updateUI(); 
         writeLog("Showed pure honor", "gain");
         writeStory("You show respect to the ancient site, taking nothing but the view.");
         addContinue(ending); 
     });
+}
+
+let dragonTurn = 0;
+
+function dragonEncounter() {
+    dragonTurn = 0;
+    clearChoices();
+    writeLog("The Dragon has appeared!", "warn");
+    writeStory("The Frost Dragon bellows: 'Thief!' The ground shakes as the beast emerges.");
+
+setTimeout(() => { //animation
+        addContinue(dragonBattle);
+    }, 50);
 }
 
 function dragonBattle() {
@@ -588,7 +608,42 @@ function gameOver(reason) {
     addChoice("Restart Journey", initGame);
 }
 
-initGame();
+// --- LOBBY & START ---
 
-//fix function forest add barehand scene
-// //add a twist for the 'observe in the shadow' choice
+function initGame() {
+    textEl.innerHTML = "";
+    logEl.innerHTML = "";
+    clearChoices();
+    
+    player = { health: 100, gold: 15, reputation: 0, inventory: [], hasMap: false };
+    dragonHP = 150;
+    updateUI();
+
+    // The Lobby UI
+    writeStory(`
+        <div style="text-align:center; padding: 20px; border: 1px solid #444; background: rgba(0,0,0,0.2); border-radius: 8px;">
+            <h1 style="color: #a68d60; margin-bottom: 10px; letter-spacing: 3px;">LIFE IN ADVENTURE</h1>
+            <p style="font-style: italic; color: #888;">"Every legend begins with a single choice."</p>
+            <hr style="border: 0; border-top: 1px solid #444; margin: 20px 0;">
+            <p style="text-align: left; font-size: 0.95rem;">
+                Welcome, Traveler. In this realm, your <b>Reputation</b> determines how the world sees you, 
+                and your <b>Gold</b> dictates what you can survive. 
+                Keep a sharp eye on your <b>HP</b>—the path to the Frozen Peak is treacherous.
+            </p>
+        </div>
+    `);
+
+    addChoice("START NEW ADVENTURE", introCinematic);
+}
+
+function introCinematic() {
+    textEl.innerHTML = "";
+    writeStory("The wind howls through the valley of Oakhaven, carrying whispers of a forgotten dragon and a gem that can bend the soul.");
+    writeStory("You arrived here with nothing but a few coins and a restless spirit, seeking a name that will outlive your bones.");
+    
+    setTimeout(() => {
+        addContinue(startGame);
+    }, 800);
+}
+
+initGame();
