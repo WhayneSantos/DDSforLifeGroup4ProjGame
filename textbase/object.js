@@ -1,3 +1,5 @@
+// --- GAME STATE OBJECTS --- // 
+
 let player = { health: 100, gold: 15, reputation: 0, inventory: [], hasMap: false };
 let dragonHP = 150;
 
@@ -10,12 +12,20 @@ const repEl = document.getElementById('rep');
 const overlayEl = document.getElementById('chapter-overlay');
 const titleTextEl = document.getElementById('chapter-title-text');
 
+/**
+ * Syncs the current player object values (HP, Gold, Rep) 
+ * with the visual numbers shown on the screen.
+ */
 function updateUI() {
     hpEl.innerText = player.health;
     goldEl.innerText = player.gold;
     repEl.innerText = player.reputation;
 }
 
+/**
+ * Triggers a temporary "Chapter Title" overlay.
+ * It shows the title, waits 2.5 seconds, then fades out.
+ */
 function showChapter(title) {
     titleTextEl.innerText = title;
     overlayEl.classList.remove('chapter-hidden');
@@ -27,14 +37,22 @@ function showChapter(title) {
     }, 2500);
 }
 
+/**
+ * Adds a new paragraph of story text to the game window.
+ * Automatically scrolls to the bottom so the player sees the newest text.
+ */
 function writeStory(text) {
     const p = document.createElement('p');
     p.innerHTML = text;
-    p.classList.add('new-story-line');
+    p.classList.add('new-story-line'); // Used to style the most recent text differently
     textEl.appendChild(p);
-    textEl.scrollTop = textEl.scrollHeight;
+    textEl.scrollTop = textEl.scrollHeight; // Auto-scrolls to the bottom
 }
 
+/**
+ * Adds a technical notification to the side log (e.g., "Item Gained" or "Took Damage").
+ * Uses different CSS classes based on the 'type' for color-coding.
+ */
 function writeLog(msg, type = "info") {
     const entry = document.createElement('div');
     entry.className = type === "gain" ? "log-gain" : type === "loss" ? "log-loss" : type === "warn" ? "log-warn" : "";
@@ -43,7 +61,19 @@ function writeLog(msg, type = "info") {
     logEl.scrollTop = logEl.scrollHeight;
 }
 
-function clearChoices() { choiceEl.innerHTML = ""; }
+/**
+ * Removes all current buttons from the choice container.
+ * Usually called before displaying new choices.
+ */
+function clearChoices() { 
+    choiceEl.innerHTML = ""; 
+
+}
+
+/**
+ * Creates a single "Continue" button.
+ * When clicked, it dims the current text and moves the story to the next function.
+ */
 
 function addContinue(nextSceneFunction) {
     clearChoices();
@@ -65,12 +95,12 @@ function addChoice(text, action) {
         const allLines = textEl.querySelectorAll('.new-story-line');
         allLines.forEach(line => line.classList.replace('new-story-line', 'old-story-line'));
         clearChoices();
-        action();
+        action(); // Run the consequence/next scene
     };
     choiceEl.appendChild(btn);
 }
 
-// --- STORY FLOW ---
+// --- STORY FLOW --- //
 
 function initGame() {
     textEl.innerHTML = "";
@@ -78,6 +108,8 @@ function initGame() {
     writeStory("<p style='text-align:center;'>Welcome to Life in Adventure.<br>Your legend begins with a single step.</p>");
     addChoice("Begin Journey", startGame);
 }
+
+// --- START GAME ---//
 
 function startGame() {
     player = { health: 100, gold: 15, reputation: 0, inventory: [], hasMap: false };
@@ -89,6 +121,8 @@ function startGame() {
     writeStory("The sun dips below the jagged horizon, painting the sky in bruises of purple and gold. In the village of North Crest, the evening air turns biting and sharp. As you navigate the narrow, cobblestone alleyways near the town square, a desperate cry for help shatters the silence.");
     writeStory("You round a corner to find three hooded bandits, their rusted daggers glinting in the moonlight. They have cornered an elderly traveler against a crumbling stone wall. The old man clutches a tattered bag to his chest, his hands trembling with fear.");
     
+// --- CHOICE BRANCHES --- //
+
     addChoice("Intervene: 'Leave him be!'", () => {
         player.reputation += 40; player.health -= 15; player.hasMap = true;
         player.inventory.push("Old Map");
@@ -164,6 +198,8 @@ function townGate() {
     }
 }
 
+// --- MARKET --- //
+
 function market() {
     showChapter("Chapter III: Market");
     setTimeout(marketShop, 500);
@@ -176,7 +212,9 @@ function marketShop() {
 
     if (!player.inventory.includes("Steel Sword") && !player.inventory.includes("Rusty Sword")) {
         writeStory("A burly blacksmith eyes your empty belt. 'Heading North? 10 gold for Oakhaven Steel, or take this <b>Rusty Sword</b> for free—it's scrap anyway.'");
-        
+    
+        // --- CHOICE BRANCHES --- //
+
         addChoice("Purchase Steel Sword (10 Gold)", () => {
             if (player.gold >= 10) {
                 player.gold -= 10; player.inventory.push("Steel Sword");
@@ -215,11 +253,15 @@ function marketShop() {
     });
 }
 
+// --- SORCERER --- //
+
 function sorcererEncounter() {
     if (!player.atSorcerer) { 
         showChapter("The Mist Sorcerer"); 
         player.atSorcerer = true; 
     }
+
+// --- CHOICE BRANCHES --- //
 
     clearChoices();
     writeStory("<b>The Sorcerer of the Mist</b>");
@@ -273,6 +315,8 @@ function sorcererEncounter() {
     }
 }
 
+// --- UPGRADE LOGIC --- //
+
 function applyUpgrade() {
     if (player.inventory.includes("Steel Sword")) {
         player.inventory = player.inventory.filter(i => i !== "Steel Sword");
@@ -294,6 +338,8 @@ function applyUpgrade() {
     }
 }
 
+// --- FOREST & PRACTICE COMBAT --- //
+
 function forest() {
     showChapter("Chapter IV: The Woods");
     writeStory("<b>Chapter 4: The Whispering Woods</b>");
@@ -305,6 +351,8 @@ function forest() {
     player.forestTurn = 0; // Initialize practice turn counter
     forestPracticeCombat();
 }
+
+// --- CHOICE BRANCHES --- //
 
 function forestPracticeCombat() {
     clearChoices();
@@ -393,11 +441,15 @@ function forestPostCombat() {
     });
 }
 
+// --- MOUNTAIN --- //
+
 function mountainPass() {
     showChapter("Chapter V: The Peak");
     writeStory("<b>Chapter 5: The Cold Mountain</b>");
     writeStory("You are climbing up a very high mountain now. There is snow on the ground and the wind is blowing very hard. You find a small cave.");
     
+// --- CHOICE BRANCHES --- //
+
     addChoice("Rest and light a fire", () => {
         player.health = Math.min(100, player.health + 15);
         writeLog("Rested by fire (+15 HP)", "gain");
@@ -410,10 +462,14 @@ function mountainPass() {
     });
 }
 
+// --- FROZENPEAK --- //
+
 function frozenPeak() {
     showChapter("Chapter VI: The Gem");
     writeStory("<b>Chapter 6: The Ascent of Sorrows</b>");
     writeStory("You reach the summit. At the center of a hoard rests the *Dragon Soul Gem*, pulsing with power.");
+
+// --- CHOICE BRANCHES --- //
 
     addChoice("Fill packs with gold", () => { 
         player.gold += 150; 
@@ -445,6 +501,8 @@ function frozenPeak() {
 
 let dragonTurn = 0;
 
+// --- DRAGON ENCOUNTER --- //
+
 function dragonEncounter() {
     dragonTurn = 0;
     clearChoices();
@@ -456,6 +514,8 @@ setTimeout(() => { //animation
     }, 50);
 }
 
+// --- DRAGON BATTLE --- //
+
 function dragonBattle() {
     if (player.health <= 0) {
         return gameOver("The Frost Dragon's breath turned your blood to ice. Your journey ends here, frozen in time.");
@@ -465,6 +525,8 @@ function dragonBattle() {
         writeStory("With one final, desperate thrust, you find a gap in the dragon's armor. The beast lets out a sky-shaking roar before collapsing, its crystalline body shattering into a thousand shimmering shards.");
         return ending();
     }
+
+// --- DRAGON SPECIAL ATTACK --- //
 
     dragonTurn++;
     clearChoices();
@@ -479,6 +541,8 @@ function dragonBattle() {
     } else {
         dragonAction = "The dragon looms over you, its claws scraping against the icy stone.";
     }
+
+    // --- player attack branches --- //
 
     writeStory(`<b>[TURN ${dragonTurn}]</b><br>${dragonAction}<br>Dragon HP: ${dragonHP} | Your HP: ${player.health}`);
 
@@ -506,6 +570,8 @@ function dragonBattle() {
         updateUI();
         dragonBattle();
     });
+
+    // --- Dodge and Counter Branch --- //
 
     addChoice("Dodge and Counter", () => {
         let taken = 0;
@@ -539,6 +605,8 @@ function dragonBattle() {
         dragonBattle();
     });
 
+    // --- Use Gem Branch --- //
+
     if (player.inventory.includes("Dragon Soul Gem")) {
         addChoice("Use Dragon Soul Gem", () => {
             writeStory("The Gem in your pack pulses with blinding light! It drains the dragon's heat.");
@@ -551,6 +619,8 @@ function dragonBattle() {
         });
     }
 }
+
+// --- ENDING & GAME OVER --- //
 
 function ending() {
     clearChoices();
@@ -596,6 +666,8 @@ function ending() {
     addChoice("Begin a New Legend", initGame);
 }
 
+// --- GAME OVER --- //
+
 function gameOver(reason) {
     clearChoices();
     writeLog("GAME OVER", "loss");
@@ -608,7 +680,7 @@ function gameOver(reason) {
     addChoice("Restart Journey", initGame);
 }
 
-// --- LOBBY & START ---
+// --- LOBBY & START --- //
 
 function initGame() {
     textEl.innerHTML = "";
@@ -635,6 +707,8 @@ function initGame() {
 
     addChoice("START NEW ADVENTURE", introCinematic);
 }
+
+// --- GAME INTRO --- //
 
 function introCinematic() {
     textEl.innerHTML = "";
