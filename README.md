@@ -1,7 +1,7 @@
 Santos, Whayne
 Guardian, Racelle
 
-Life in Adventure: JS Edition
+Unwritten Adventure: JS Edition
 A choice-driven, text-based RPG built with vanilla JavaScript, HTML5, and CSS3. Navigate through a perilous fantasy world where every decision affects your reputation, wealth, and ultimate survival.
 
 
@@ -15,7 +15,7 @@ Turn-Based Combat: A strategic combat system featuring "Attack" and "Dodge/Count
 
 Inventory & Upgrades: Collect items like maps and soul gems, or visit the Mist Sorcerer to enchant your steel.
 
-Multiple Endings: Your journey concludes with a unique title (e.g., The Hero King or The Wealthy Outcast) based on your moral choices throughout the game.
+Multiple Endings: Your journey concludes with a unique title based on your moral choices throughout the game.
 
 
 
