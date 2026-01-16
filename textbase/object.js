@@ -181,8 +181,8 @@ function townGate() {
         } else { writeLog("Pockets are too light.", "warn"); townGate(); }
     });
 
-    addChoice("Slink through the sewers (-25 HP)", () => {
-        player.health -= 50; updateUI();
+    addChoice("Slink through the sewers (-30 HP)", () => {
+        player.health -= 30; updateUI();
         writeLog("Took sewer damage", "loss");
         if (player.health <= 0) return gameOver("The toxic fumes of the under-city took your life.");
         writeStory("You find a rusted grate. The smell is an assault on your senses, but you emerge inside the city walls hours later. It almost took your life.");
