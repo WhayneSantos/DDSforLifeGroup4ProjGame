@@ -1,6 +1,8 @@
 Santos Whayne,
 Guardian Racelle
 
+Click to start
+
 Unwritten Adventure: JS Edition
 A choice-driven, text-based RPG built with vanilla JavaScript, HTML5, and CSS3. Navigate through a perilous fantasy world where every decision affects your reputation, wealth, and ultimate survival.
 
