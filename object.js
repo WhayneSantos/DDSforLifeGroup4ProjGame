@@ -11,6 +11,24 @@ const goldEl = document.getElementById('gold');
 const repEl = document.getElementById('rep');
 const overlayEl = document.getElementById('chapter-overlay');
 const titleTextEl = document.getElementById('chapter-title-text');
+const sceneImgEl = document.getElementById('scene-image');
+
+// --- FIXED IMAGE LOGIC --- //
+
+function changeImage(url) {
+    if (!sceneImgEl) return;
+    sceneImgEl.classList.add('fade-out');
+    setTimeout(() => {
+        sceneImgEl.src = url;
+        sceneImgEl.onload = () => {
+            sceneImgEl.classList.remove('fade-out');
+        };
+        sceneImgEl.onerror = () => {
+            sceneImgEl.classList.remove('fade-out');
+            console.error("Failed to load image at: " + url);
+        };
+    }, 500);
+}
 
 /**
  * Syncs the current player object values (HP, Gold, Rep) 
@@ -54,13 +72,26 @@ function writeStory(text) {
  * Uses different CSS classes based on the 'type' for color-coding.
  */
 function writeLog(msg, type = "info") {
+    const logEl = document.getElementById('system-log');
+    
+    if (!logEl) {
+        console.error("Element #system-log not found in HTML");
+        return;
+    }
+    
     const entry = document.createElement('div');
-    entry.className = type === "gain" ? "log-gain" : type === "loss" ? "log-loss" : type === "warn" ? "log-warn" : "";
-    entry.innerText = `> ${msg}`; // Fixed syntax: Added backticks and removed lone '>'
+    
+    if (type === "gain") entry.className = "log-gain";
+    else if (type === "loss") entry.className = "log-loss";
+    else if (type === "warn") entry.className = "log-warn";
+    else entry.className = "log-info";
+    
+    entry.innerText = `> ${msg}`;
+    
+    // 3. Add to the window and scroll
     logEl.appendChild(entry);
     logEl.scrollTop = logEl.scrollHeight;
 }
-
 /**
  * Removes all current buttons from the choice container.
  * Usually called before displaying new choices.
@@ -115,12 +146,13 @@ function startGame() {
     player = { health: 100, gold: 15, reputation: 0, inventory: [], hasMap: false };
     dragonHP = 150;
     updateUI();
-    showChapter("Chapter I: Shadows");
+    changeImage("images/forest.png");
+                        showChapter("Chapter I: Shadows");
     
     writeStory("<b>Chapter 1: The Shadows of Oakhaven</b>");
     writeStory("The sun dips below the jagged horizon, painting the sky in bruises of purple and gold. In the village of North Crest, the evening air turns biting and sharp. As you navigate the narrow, cobblestone alleyways near the town square, a desperate cry for help shatters the silence.");
     writeStory("You round a corner to find three hooded bandits, their rusted daggers glinting in the moonlight. They have cornered an elderly traveler against a crumbling stone wall. The old man clutches a tattered bag to his chest, his hands trembling with fear.");
-    
+
 // --- CHOICE BRANCHES --- //
 
     addChoice("Intervene: 'Leave him be!'", () => {
@@ -137,23 +169,23 @@ function startGame() {
 addChoice("Observe from the darkness", () => {
     writeLog("Stayed in the shadows.");
     writeStory("You press your back against the cold brick, holding your breath. You watch in silence as the bandits roughly shove the old man to the ground, snatching his bag.");
-    
+
 
     writeStory("<br>As the bandits turn to flee, the leader stops. He sniffs the air and looks directly at your hiding spot. 'Well, well,' he sneers, 'a witness who likes to watch.'");
     writeStory("They don't attack, but they mock your cowardice. One tosses a heavy, blood-stained coin at your feet. 'A gift for staying quiet, mouse.'");
-    
+
     player.gold += 5;
     player.reputation -= 10;
     updateUI();
-    
+
     writeLog("Gained 5 Blood Money", "gain");
     writeLog("Reputation decreased (Cowardice)", "loss");
-    
+
     writeStory("The bandits vanish. You find a <b>Scrap of Parchment</b> the old man dropped—it’s a piece of the map, but the rest is gone with the thieves.");
-    
+
     player.hasMap = true;
     player.inventory.push("Tattered Map Piece");
-    
+
     addContinue(townGate);
 });
 
@@ -167,11 +199,12 @@ addChoice("Observe from the darkness", () => {
 }
 
 function townGate() {
+    changeImage("images/towngate.png")
     showChapter("Chapter II: The Iron Gate");
     writeStory("<b>Chapter 2: The Iron Gate</b>");
     writeStory("You reach the Great Northern Gate, a massive structure of iron-reinforced oak. A captain of the guard stands there, leaning on a spear.");
     writeStory("'The city is under high alert,' he grunts. 'Nobody enters without paying the toll. Five gold coins, or you find somewhere else to sleep.'");
-    
+
     addChoice("Hand over 5 gold", () => {
         if (player.gold >= 5) {
             player.gold -= 5; updateUI();
@@ -201,6 +234,7 @@ function townGate() {
 // --- MARKET --- //
 
 function market() {
+    changeImage("images/gildedmarket.png")
     showChapter("Chapter III: Market");
     setTimeout(marketShop, 500);
 }
@@ -212,7 +246,7 @@ function marketShop() {
 
     if (!player.inventory.includes("Steel Sword") && !player.inventory.includes("Rusty Sword")) {
         writeStory("A burly blacksmith eyes your empty belt. 'Heading North? 10 gold for Oakhaven Steel, or take this <b>Rusty Sword</b> for free—it's scrap anyway.'");
-    
+
         // --- CHOICE BRANCHES --- //
 
         addChoice("Purchase Steel Sword (10 Gold)", () => {
@@ -257,6 +291,7 @@ function marketShop() {
 
 function sorcererEncounter() {
     if (!player.atSorcerer) { 
+        changeImage("images/sorcerer.png")
         showChapter("The Mist Sorcerer"); 
         player.atSorcerer = true; 
     }
@@ -272,7 +307,7 @@ function sorcererEncounter() {
 
     if (hasUpgraded) {
         writeStory("<i style='color: #82aaff;'>The old man reaches out to touch your blade, then draws back his hand. 'This steel already sings with my magic, traveler. I cannot layer mists upon a storm.'</i>");
-        
+
         addChoice("Ignore him and move on", () => {
             player.atSorcerer = false; 
             writeLog("Left the hut behind.");
@@ -341,13 +376,15 @@ function applyUpgrade() {
 // --- FOREST & PRACTICE COMBAT --- //
 
 function forest() {
+    changeImage("images/mistpantherr.png")
     showChapter("Chapter IV: The Woods");
     writeStory("<b>Chapter 4: The Whispering Woods</b>");
-    
+
     // Practice Stage logic starts here
-    writeStory("The fog thickens. Suddenly, a <b>Mist Panther</b> stalks out from the brush. Its muscles coil—it is preparing to strike!");
+    writeStory("The mist here doesn't just hang in the air; it breathes. As you navigate the gnarled roots, a section of the fog seems to solidify. The Mist Panther doesn't just step out—it manifests.");
+    writeStory("It stands nearly five feet at the shoulder, its body long and serpentine. Unlike a normal feline, its breath comes out as a faint, glowing vapor that smells of wet stone and ozone.");
     writeStory("<small style='color: #82aaff;'><i>Practice Tip: Watch the enemy's intent. When an enemy 'coils' or 'charges,' it is usually better to Dodge than to Attack.</i></small>");
-    
+
     player.forestTurn = 0; // Initialize practice turn counter
     forestPracticeCombat();
 }
@@ -357,7 +394,7 @@ function forest() {
 function forestPracticeCombat() {
     clearChoices();
     player.forestTurn++;
-    
+
     let pantherAction = "";
     let isPouncing = (player.forestTurn % 2 === 0);
 
@@ -373,11 +410,11 @@ function forestPracticeCombat() {
     addChoice("Strike with Weapon", () => {
         let dmg = player.inventory.length > 0 ? 25 : 5;
         let penalty = isPouncing ? 20 : 5; // Higher damage taken if you attack while he pounces
-        
+
         player.health -= penalty;
         writeStory(`You strike the panther for ${dmg} DMG, but it claws you for ${penalty} DMG.`);
         writeLog(`Took ${penalty} DMG`, "loss");
-        
+
         checkForestVictory(dmg);
     });
 
@@ -385,14 +422,14 @@ function forestPracticeCombat() {
     addChoice("Dodge and Counter", () => {
         let penalty = isPouncing ? 0 : 5; // Perfect dodge if he was pouncing
         let counterDmg = 15;
-        
+
         player.health -= penalty;
         writeStory(isPouncing 
             ? "<b>Perfect!</b> You roll under the pounce and slash its belly." 
             : "You dodge its swipe and land a quick hit.");
-        
+
         writeLog(isPouncing ? "Perfect Dodge!" : "Took 5 DMG", isPouncing ? "gain" : "loss");
-        
+
         checkForestVictory(counterDmg);
     });
 }
@@ -400,7 +437,7 @@ function forestPracticeCombat() {
 function checkForestVictory(dmg) {
     updateUI();
     if (player.health <= 0) return gameOver("The Mist Panther was too much for you.");
-    
+
     // After 2 successful hits, the player wins the practice
     if (!player.practiceHits) player.practiceHits = 0;
     player.practiceHits += dmg;
@@ -416,7 +453,7 @@ function checkForestVictory(dmg) {
 
 function forestPostCombat() {
     writeStory("With the beast gone, you look at your surroundings.");
-    
+
     if (player.hasMap) {
         addChoice("Consult the Traveler's Map", () => {
             writeLog("Used map to navigate", "gain");
@@ -444,10 +481,12 @@ function forestPostCombat() {
 // --- MOUNTAIN --- //
 
 function mountainPass() {
+    changeImage("images/climbmountain.png")
     showChapter("Chapter V: The Peak");
     writeStory("<b>Chapter 5: The Cold Mountain</b>");
-    writeStory("You are climbing up a very high mountain now. There is snow on the ground and the wind is blowing very hard. You find a small cave.");
-    
+    writeStory("The path behind you has long since vanished, buried under a shifting shroud of white. As you climb, the air thins until every breath feels like swallowing needles. The wind here isn't just a sound; it’s a physical force, a relentless gale that screams through the jagged crags like a dying god.");
+    writeStory("Just as the cold begins to seep into the marrow of your bones, the swirling snow parts for a fleeting second. Carved into the face of a sheer obsidian cliff is a jagged opening—a small, low-ceilinged cave.");
+
 // --- CHOICE BRANCHES --- //
 
     addChoice("Rest and light a fire", () => {
@@ -465,26 +504,30 @@ function mountainPass() {
 // --- FROZENPEAK --- //
 
 function frozenPeak() {
-    showChapter("Chapter VI: The Gem");
+    changeImage("images/treasures.png")
+    showChapter("Chapter VI: The Legendary Gem");
     writeStory("<b>Chapter 6: The Ascent of Sorrows</b>");
-    writeStory("You reach the summit. At the center of a hoard rests the *Dragon Soul Gem*, pulsing with power.");
+    writeStory("As you crest the final, jagged ridge of the summit, the biting mountain air gives way to a heavy, metallic warmth. Before you lies a sprawling amphitheater of stone, its floor obscured by a vast, undulating sea of wealth.");
+    writeStory("Thousands of ancient gold sovereigns, stamped with the faces of forgotten kings, spill across the cavern floor like a frozen sunset. Tangled within this ocean of coin are emerald-encrusted chalices, silver-threaded tapestries, and masterwork blades that have long since surrendered their sharpness to the passage of time.");
+    writeStory("At the epicenter of this glittering ruin, resting atop a mountain of gold, lies the <h2 style='color:#ff5555;'> Dragon Soul Gem.</h2>");
 
 // --- CHOICE BRANCHES --- //
 
-    addChoice("Fill packs with gold", () => { 
+    addChoice("Fill packs with ancient gold", () => { 
         player.gold += 150; 
         player.reputation -= 15; 
         updateUI(); 
         writeLog("Stole Dragon Gold (+150)", "gain");
-        writeStory("You greedily stuff your bags with gold coins.");
+        writeStory("In a final, pivotal moment of clarity, you realize the Dragon Soul Gem is a trap—a vessel for an ancient hunger that would eventually hollow out your soul. You loosen your grip, letting the pulsing obsidian stone fall. It clatters insignificantly against the stone, its violet fire dimming as it loses its connection to a living host.");
+        writeStory("Instead, you turn your gaze toward the staggering reality of the hoard itself. You choose the Ancient Gold and Coins, the tangible legacy of a thousand years of history, over the parasitic magic of the gem.");
         dragonEncounter();
     });
 
-    addChoice("Claim the Magic Gem", () => { 
+    addChoice("Claim the Dragon Soul Gem", () => { 
         player.inventory.push("Dragon Soul Gem"); 
         writeLog("Took Dragon Soul Gem", "gain");
-        writeStory("You lift the Gem. It feels warm, vibrating with a life of its own.");
-        
+        writeStory("As your fingers close around the cold, multifaceted surface of the Dragon Soul Gem, the world around you suddenly fractures. The transition is violent and instantaneous, shifting from the physical reality of the mountain to a psychic overload of pure, draconic power.");
+
         setTimeout(() => {
             dragonEncounter(); 
         }, 100);
@@ -494,7 +537,8 @@ function frozenPeak() {
         player.reputation += 100; 
         updateUI(); 
         writeLog("Showed pure honor", "gain");
-        writeStory("You show respect to the ancient site, taking nothing but the view.");
+        writeStory("You stand at the summit, the most powerful artifact in existence clutched in your hand, yet you leave the mountain of wealth behind. The gold lies scattered and broken—lifeless yellow metal once stripped of its magical allure.");
+        writeStory("The wind howls across the peak, already beginning to bury the untouched coins in a fine layer of snow and frost. The hoard remains, vast and cold, a tomb for a king you refused to become.");
         addContinue(ending); 
     });
 }
@@ -504,10 +548,11 @@ let dragonTurn = 0;
 // --- DRAGON ENCOUNTER --- //
 
 function dragonEncounter() {
+    changeImage("images/dragonencounter.png");
     dragonTurn = 0;
     clearChoices();
     writeLog("The Dragon has appeared!", "warn");
-    writeStory("The Frost Dragon bellows: 'Thief!' The ground shakes as the beast emerges.");
+    writeStory("The cavern floor doesn't just tremble; it heaves. As you reach for the scattered riches, a mountain of silver-frosted scales shifts beneath the gold. With a sound like a glacier splintering, the Frost Dragon uncoils, rising from the hoard like a nightmare made of diamond and spite.");
 
 setTimeout(() => { //animation
         addContinue(dragonBattle);
@@ -517,8 +562,9 @@ setTimeout(() => { //animation
 // --- DRAGON BATTLE --- //
 
 function dragonBattle() {
+    changeImage("images/dragonfight.png");
     if (player.health <= 0) {
-        return gameOver("The Frost Dragon's breath turned your blood to ice. Your journey ends here, frozen in time.");
+        return gameOver("The summit, once a place of gleaming promise, becomes your altar of sacrifice. You fought with the desperation of a mortal defying a god, but the Frost Dragon is not merely a beast—it is the winter’s fury given flesh and scale. Your journey ends here, frozen in time.");
     }
     if (dragonHP <= 0) {
         writeLog("SLAYED THE FROST DRAGON", "gain");
@@ -533,9 +579,10 @@ function dragonBattle() {
 
     let isSpecialAttack = (dragonTurn % 3 === 0);
     let dragonAction = "";
-    
+
     if (isSpecialAttack) {
         dragonAction = "<b style='color:#82aaff'>The dragon is inhaling deeply... Frost is forming around its jaws!</b>";
+        changeImage("Images/dragonWhileSpe1.png");
     } else if (dragonHP < 50) {
         dragonAction = "<b style='color:#ff5555'>The dragon is enraged! It's preparing a massive tail sweep!</b>";
     } else {
@@ -548,8 +595,8 @@ function dragonBattle() {
 
     addChoice("All-Out Attack", () => {
         let dmg = 5;
-        let msg = "You punch the dragon's scales! it barely even notice";
-        
+        let msg = "You punch the dragon's scales! it barely even notice"; /* if the player has no sword*/
+
         if (player.inventory.includes("Steel Sword +1")) { dmg = 45; msg = "Your enchanted Oakhaven Steel cleaves deep!"; }
         else if (player.inventory.includes("Steel Sword")) { dmg = 30; msg = "Your Steel Sword bites into its hide!"; }
         else if (player.inventory.includes("Reforged Blade")) { dmg = 25; msg = "The reforged blade strikes true!"; }
@@ -563,7 +610,7 @@ function dragonBattle() {
         let taken = isSpecialAttack ? 40 : 20;
         dragonHP -= dmg;
         player.health -= taken;
-        
+
         writeStory(`${msg} (${dmg} DMG)`);
         writeLog(`Dealt ${dmg} DMG`, "gain");
         writeLog(`Took ${taken} DMG`, "loss");
@@ -584,7 +631,9 @@ function dragonBattle() {
                 taken = 0;
                 logMsg = "Perfect Dodge! 0 DMG taken";
                 writeStory("As the dragon unleashes a torrent of frost, you dive behind a jagged rock! The ice misses you completely.");
+                changeImage("Images/dragonDoSpe1.png");
             } else {
+                changeImage("Images/dragonDoSpe1.png");
                 taken = 15; // Penalty for failing a high-stakes dodge
                 logMsg = "Dodge failed! Took 15 DMG";
                 writeStory("You try to dive away, but the frost breath catches your cloak!");
@@ -595,10 +644,10 @@ function dragonBattle() {
             logMsg = "Dodged! Only took 10 DMG";
             writeStory("You roll beneath the dragon's strike, delivering a quick counter-blow as you move.");
         }
-        
+
         player.health -= taken;
         dragonHP -= counterDmg;
-        
+
         writeLog(logMsg, taken === 0 ? "gain" : "loss");
         writeLog(`Countered for ${counterDmg} DMG`, "gain");
         updateUI();
@@ -624,9 +673,10 @@ function dragonBattle() {
 
 function ending() {
     clearChoices();
+    changeImage("Images/dragondefeated.png"); /* no image yet */
     showChapter("The Legend Ends");
     writeStory("<b>The Long Road Home</b>");
-    
+
     let title = "";
     let epilogue = "";
     let gemNote = "";
@@ -639,14 +689,10 @@ function ending() {
         title = "The Hero King";
         epilogue = "With the dragon defeated, you were carried back to the city on the shoulders of the guard. You used your renown to lead Oakhaven into a golden age of peace and prosperity.";
     } 
-    else if (player.reputation <= -20) {
+    else if (player.gold >= 150) {
         title = "The Wealthy Outcast";
         epilogue = "You returned with heavy bags of dragon gold, but the people look at you with fear and suspicion. You live in a hollow palace, surrounded by riches but haunted by the shadows of those you stepped on.";
     } 
-    else {
-        title = "The Lone Mercenary";
-        epilogue = "The dragon is dead, and your pockets are full enough to live comfortably. You disappeared into the mist shortly after, a wanderer whose name is whispered in taverns but never truly known.";
-    }
 
     if (player.inventory.includes("Dragon Soul Gem")) {
         gemNote = "<br><br><i style='color: #82aaff;'>The Dragon Soul Gem remains in your possession, pulsing with a faint, rhythmic heat. Some say you are waiting for the right moment to sell it, while others whisper that the dragon's spirit is beginning to talk to you in your sleep...</i>";
@@ -659,10 +705,10 @@ function ending() {
     // Fixed Syntax: Backticks added for multi-line/variable string
     writeStory(`The dust of battle settles as you descend the mountain for the final time. ${epilogue}${gemNote}`);
     writeStory(`Your Legend is etched into history as: <b style="color: #a68d60; font-size: 1.2rem;">${title}</b>`);
-    
+
     writeLog("Story Completed.", "gain");
     writeStory(`<small style='opacity:0.6'>Final Stats — Gold: ${player.gold} | Reputation: ${player.reputation}</small>`);
-    
+
     addChoice("Begin a New Legend", initGame);
 }
 
@@ -670,8 +716,9 @@ function ending() {
 
 function gameOver(reason) {
     clearChoices();
+    changeImage("Images/travelerdefeated.png")
     writeLog("GAME OVER", "loss");
-    
+
     writeStory(`<div style="text-align:center; padding: 20px;">
         <h2 style='color:#ff5555; letter-spacing: 2px;'>— YOU HAVE PERISHED —</h2>
         <p>${reason}</p>
@@ -686,10 +733,11 @@ function initGame() {
     textEl.innerHTML = "";
     logEl.innerHTML = "";
     clearChoices();
-    
+
     player = { health: 100, gold: 15, reputation: 0, inventory: [], hasMap: false };
     dragonHP = 150;
     updateUI();
+    changeImage("Images/intro.png");
 
     // The Lobby UI
     writeStory(`
@@ -714,7 +762,7 @@ function introCinematic() {
     textEl.innerHTML = "";
     writeStory("The wind howls through the valley of Oakhaven, carrying whispers of a forgotten dragon and a gem that can bend the soul.");
     writeStory("You arrived here with nothing but a few coins and a restless spirit, seeking a name that will outlive your bones.");
-    
+
     setTimeout(() => {
         addContinue(startGame);
     }, 800);
