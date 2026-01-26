@@ -136,7 +136,7 @@ function addChoice(text, action) {
 function initGame() {
     textEl.innerHTML = "";
     logEl.innerHTML = "";
-    writeStory("<p style='text-align:center;'>Welcome to Life in Adventure.<br>Your legend begins with a single step.</p>");
+    writeStory("<p style='text-align:center;'>UNWRITTEN ADVENTURE<br>Your legend begins with a single step.</p>");
     addChoice("Begin Journey", startGame);
 }
 
