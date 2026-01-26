@@ -742,7 +742,7 @@ function initGame() {
     // The Lobby UI
     writeStory(`
         <div style="text-align:center; padding: 20px; border: 1px solid #444; background: rgba(0,0,0,0.2); border-radius: 8px;">
-            <h1 style="color: #a68d60; margin-bottom: 10px; letter-spacing: 3px;">LIFE IN ADVENTURE</h1>
+            <h1 style="color: #a68d60; margin-bottom: 10px; letter-spacing: 3px;">UNWRITTEN ADVENTURE</h1>
             <p style="font-style: italic; color: #888;">"Every legend begins with a single choice."</p>
             <hr style="border: 0; border-top: 1px solid #444; margin: 20px 0;">
             <p style="text-align: left; font-size: 0.95rem;">
