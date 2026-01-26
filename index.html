@@ -2,37 +2,34 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Unwritten Adventure - Web</title>
+    <title>RPG Adventure</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
+    
     <div id="chapter-overlay" class="chapter-hidden">
-        <div id="chapter-title-text"></div>
-    </div>
+    <h1 id="chapter-title-text"></h1>
+</div>
 
+<div class="main-wrapper">
     <div class="game-container">
-        <div id="status-bar">
-            <span>HP: <span id="hp">100</span></span>
-            <span>Gold: <span id="gold">15</span></span>
-            <span>Rep: <span id="rep">0</span></span>
+        <div class="stats-bar">
+            HP: <span id="hp">100</span>
+            Gold: <span id="gold">15</span>
+            Rep: <span id="rep">0</span>
         </div>
-
-        <div id="game-text">
-            </div>
-
-        <div id="choices" class="button-grid">
-            </div>
-
-        <div id="log-window">
-            <div class="log-header">INVENTORY & SYSTEM LOG</div>
-            <div id="system-log">
-                <div class="log-entry">Waiting for adventure...</div>
-            </div>
+        <div id="game-text" class="text-display"></div>
+        <div id="choices" class="button-grid"></div>
+    </div>
+    
+    <div class="image-sidebar">
+        <div class="log-window" id="system-log"></div>
+        <div class="image-frame">
+            <img id="scene-image" src="Images/intro.png" alt="Scene">
         </div>
     </div>
-
+</div>
+    
     <script src="object.js"></script>
 </body>
 </html>
