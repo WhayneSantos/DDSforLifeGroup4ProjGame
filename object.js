@@ -86,7 +86,11 @@ function writeLog(msg, type = "info") {
     else if (type === "warn") entry.className = "log-warn";
     else entry.className = "log-info";
     
+<<<<<<< HEAD
     entry.innerText = `> ${msg}`;
+=======
+    entry.innerText = `${msg}`;
+>>>>>>> 6b3e739 (added Image)
     
     // 3. Add to the window and scroll
     logEl.appendChild(entry);
@@ -136,7 +140,11 @@ function addChoice(text, action) {
 function initGame() {
     textEl.innerHTML = "";
     logEl.innerHTML = "";
+<<<<<<< HEAD
     writeStory("<p style='text-align:center;'>UNWRITTEN ADVENTURE<br>Your legend begins with a single step.</p>");
+=======
+    writeStory("<p style='text-align:center;'>UNWRITTEN ADVENTURE.<br>Your legend begins with a single step.</p>");
+>>>>>>> 6b3e739 (added Image)
     addChoice("Begin Journey", startGame);
 }
 
@@ -428,7 +436,11 @@ function forestPracticeCombat() {
             ? "<b>Perfect!</b> You roll under the pounce and slash its belly." 
             : "You dodge its swipe and land a quick hit.");
 
+<<<<<<< HEAD
         writeLog(isPouncing ? "Perfect Dodge!" : "Took 5 DMG", isPouncing ? "gain" : "loss");
+=======
+        writeLog(isPouncing ? "Perfect Dodge!" : `Took 5 DMG`, isPouncing ? "gain" : "loss");
+>>>>>>> 6b3e739 (added Image)
 
         checkForestVictory(counterDmg);
     });
@@ -630,6 +642,7 @@ function dragonBattle() {
             if (Math.random() < 0.80) {
                 taken = 0;
                 logMsg = "Perfect Dodge! 0 DMG taken";
+                changeImage("Images/dragonDoSpe1.png");
                 writeStory("As the dragon unleashes a torrent of frost, you dive behind a jagged rock! The ice misses you completely.");
                 changeImage("Images/dragonDoSpe1.png");
             } else {
@@ -742,7 +755,11 @@ function initGame() {
     // The Lobby UI
     writeStory(`
         <div style="text-align:center; padding: 20px; border: 1px solid #444; background: rgba(0,0,0,0.2); border-radius: 8px;">
+<<<<<<< HEAD
             <h1 style="color: #a68d60; margin-bottom: 10px; letter-spacing: 3px;">UNWRITTEN ADVENTURE</h1>
+=======
+            <h1 style="color: #a68d60; margin-bottom: 10px; letter-spacing: 3px;"> ADVENTURE</h1>
+>>>>>>> 6b3e739 (added Image)
             <p style="font-style: italic; color: #888;">"Every legend begins with a single choice."</p>
             <hr style="border: 0; border-top: 1px solid #444; margin: 20px 0;">
             <p style="text-align: left; font-size: 0.95rem;">
