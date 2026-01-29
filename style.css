@@ -90,7 +90,7 @@ body {
 .fade-out { opacity: 0; }
 
 .log-window {
-    margin-top: ;
+    margin-top: 0;
     background: #0a0a09;
     border: 1px solid #262420;
     padding: 10px;
