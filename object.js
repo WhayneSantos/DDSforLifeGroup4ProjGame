@@ -60,10 +60,10 @@ function showChapter(title) {
  * Automatically scrolls to the bottom so the player sees the newest text.
  */
 function writeStory(text) {
-    const p = document.createElement('p');
-    p.innerHTML = text;
-    p.classList.add('new-story-line'); // Used to style the most recent text differently
-    textEl.appendChild(p);
+    const el = document.createElement('p');
+    el.innerHTML = text;
+    el.classList.add('new-story-line'); // Used to style the most recent text differently
+    textEl.appendChild(el);
     textEl.scrollTop = textEl.scrollHeight; // Auto-scrolls to the bottom
 }
 
@@ -80,19 +80,8 @@ function writeLog(msg, type = "info") {
     }
     
     const entry = document.createElement('div');
-    
-    if (type === "gain") entry.className = "log-gain";
-    else if (type === "loss") entry.className = "log-loss";
-    else if (type === "warn") entry.className = "log-warn";
-    else entry.className = "log-info";
-    
-<<<<<<< HEAD
-    entry.innerText = `> ${msg}`;
-=======
-    entry.innerText = `${msg}`;
->>>>>>> 6b3e739 (added Image)
-    
-    // 3. Add to the window and scroll
+    entry.className = type === "gain" ? "log-gain" : type === "loss" ? "log-loss" : type === "warn" ? "log-warn" : "";
+    entry.innerText = `> ${msg}`; // Fixed syntax: Added backticks and removed lone '>'
     logEl.appendChild(entry);
     logEl.scrollTop = logEl.scrollHeight;
 }
@@ -137,16 +126,6 @@ function addChoice(text, action) {
 
 // --- STORY FLOW --- //
 
-function initGame() {
-    textEl.innerHTML = "";
-    logEl.innerHTML = "";
-<<<<<<< HEAD
-    writeStory("<p style='text-align:center;'>UNWRITTEN ADVENTURE<br>Your legend begins with a single step.</p>");
-=======
-    writeStory("<p style='text-align:center;'>UNWRITTEN ADVENTURE.<br>Your legend begins with a single step.</p>");
->>>>>>> 6b3e739 (added Image)
-    addChoice("Begin Journey", startGame);
-}
 
 // --- START GAME ---//
 
@@ -154,7 +133,7 @@ function startGame() {
     player = { health: 100, gold: 15, reputation: 0, inventory: [], hasMap: false };
     dragonHP = 150;
     updateUI();
-    changeImage("images/forest.png");
+    changeImage("Images/forest.png");
                         showChapter("Chapter I: Shadows");
     
     writeStory("<b>Chapter 1: The Shadows of Oakhaven</b>");
@@ -207,7 +186,7 @@ addChoice("Observe from the darkness", () => {
 }
 
 function townGate() {
-    changeImage("images/towngate.png")
+    changeImage("Images/towngate.png")
     showChapter("Chapter II: The Iron Gate");
     writeStory("<b>Chapter 2: The Iron Gate</b>");
     writeStory("You reach the Great Northern Gate, a massive structure of iron-reinforced oak. A captain of the guard stands there, leaning on a spear.");
@@ -242,7 +221,7 @@ function townGate() {
 // --- MARKET --- //
 
 function market() {
-    changeImage("images/gildedmarket.png")
+    changeImage("Images/gildedmarket.png")
     showChapter("Chapter III: Market");
     setTimeout(marketShop, 500);
 }
@@ -285,7 +264,7 @@ function marketShop() {
 
     addChoice("Depart for the Woods", () => {
         if (!player.inventory.includes("Steel Sword") && !player.inventory.includes("Rusty Sword")) {
-            writeStory("<span style='color: #ffca28;'>Warning: 'You are unarmed are you on a suicide mission?</span> keep the <b>Rusty Sword</b> for your own sake.'");
+            writeStory("<span style='color: #ffca28;'>Warning: You are unarmed — keep the <b>Rusty Sword</b> for your own sake.</span>");
             addChoice("Go anyway (Bare Hands)", () => {
                 writeLog("Entered woods unarmed!", "warn");
                 addContinue(sorcererEncounter);
@@ -299,7 +278,7 @@ function marketShop() {
 
 function sorcererEncounter() {
     if (!player.atSorcerer) { 
-        changeImage("images/sorcerer.png")
+        changeImage("Images/sorcerer.png")
         showChapter("The Mist Sorcerer"); 
         player.atSorcerer = true; 
     }
@@ -384,7 +363,7 @@ function applyUpgrade() {
 // --- FOREST & PRACTICE COMBAT --- //
 
 function forest() {
-    changeImage("images/mistpantherr.png")
+    changeImage("Images/mistpantherr.png")
     showChapter("Chapter IV: The Woods");
     writeStory("<b>Chapter 4: The Whispering Woods</b>");
 
@@ -435,13 +414,9 @@ function forestPracticeCombat() {
         writeStory(isPouncing 
             ? "<b>Perfect!</b> You roll under the pounce and slash its belly." 
             : "You dodge its swipe and land a quick hit.");
-
-<<<<<<< HEAD
+        
         writeLog(isPouncing ? "Perfect Dodge!" : "Took 5 DMG", isPouncing ? "gain" : "loss");
-=======
-        writeLog(isPouncing ? "Perfect Dodge!" : `Took 5 DMG`, isPouncing ? "gain" : "loss");
->>>>>>> 6b3e739 (added Image)
-
+        
         checkForestVictory(counterDmg);
     });
 }
@@ -493,7 +468,7 @@ function forestPostCombat() {
 // --- MOUNTAIN --- //
 
 function mountainPass() {
-    changeImage("images/climbmountain.png")
+    changeImage("Images/climbmountain.png")
     showChapter("Chapter V: The Peak");
     writeStory("<b>Chapter 5: The Cold Mountain</b>");
     writeStory("The path behind you has long since vanished, buried under a shifting shroud of white. As you climb, the air thins until every breath feels like swallowing needles. The wind here isn't just a sound; it’s a physical force, a relentless gale that screams through the jagged crags like a dying god.");
@@ -516,7 +491,7 @@ function mountainPass() {
 // --- FROZENPEAK --- //
 
 function frozenPeak() {
-    changeImage("images/treasures.png")
+    changeImage("Images/treasures.png")
     showChapter("Chapter VI: The Legendary Gem");
     writeStory("<b>Chapter 6: The Ascent of Sorrows</b>");
     writeStory("As you crest the final, jagged ridge of the summit, the biting mountain air gives way to a heavy, metallic warmth. Before you lies a sprawling amphitheater of stone, its floor obscured by a vast, undulating sea of wealth.");
@@ -560,7 +535,7 @@ let dragonTurn = 0;
 // --- DRAGON ENCOUNTER --- //
 
 function dragonEncounter() {
-    changeImage("images/dragonencounter.png");
+    changeImage("Images/dragonencounter.png");
     dragonTurn = 0;
     clearChoices();
     writeLog("The Dragon has appeared!", "warn");
@@ -574,7 +549,7 @@ setTimeout(() => { //animation
 // --- DRAGON BATTLE --- //
 
 function dragonBattle() {
-    changeImage("images/dragonfight.png");
+    changeImage("Images/dragonfight.png");
     if (player.health <= 0) {
         return gameOver("The summit, once a place of gleaming promise, becomes your altar of sacrifice. You fought with the desperation of a mortal defying a god, but the Frost Dragon is not merely a beast—it is the winter’s fury given flesh and scale. Your journey ends here, frozen in time.");
     }
@@ -607,7 +582,7 @@ function dragonBattle() {
 
     addChoice("All-Out Attack", () => {
         let dmg = 5;
-        let msg = "You punch the dragon's scales! it barely even notice"; /* if the player has no sword*/
+        let msg = "You punch the dragon's scales! It barely even notices."; /* if the player has no sword*/
 
         if (player.inventory.includes("Steel Sword +1")) { dmg = 45; msg = "Your enchanted Oakhaven Steel cleaves deep!"; }
         else if (player.inventory.includes("Steel Sword")) { dmg = 30; msg = "Your Steel Sword bites into its hide!"; }
@@ -755,11 +730,7 @@ function initGame() {
     // The Lobby UI
     writeStory(`
         <div style="text-align:center; padding: 20px; border: 1px solid #444; background: rgba(0,0,0,0.2); border-radius: 8px;">
-<<<<<<< HEAD
-            <h1 style="color: #a68d60; margin-bottom: 10px; letter-spacing: 3px;">UNWRITTEN ADVENTURE</h1>
-=======
-            <h1 style="color: #a68d60; margin-bottom: 10px; letter-spacing: 3px;"> ADVENTURE</h1>
->>>>>>> 6b3e739 (added Image)
+            <h1 style="color: #a68d60; margin-bottom: 10px; letter-spacing: 3px;">LIFE IN ADVENTURE</h1>
             <p style="font-style: italic; color: #888;">"Every legend begins with a single choice."</p>
             <hr style="border: 0; border-top: 1px solid #444; margin: 20px 0;">
             <p style="text-align: left; font-size: 0.95rem;">
