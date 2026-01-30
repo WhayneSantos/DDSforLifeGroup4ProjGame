@@ -530,132 +530,194 @@ function frozenPeak() {
     });
 }
 
+// --- DRAGON STATE --- //
 let dragonTurn = 0;
 
-// --- DRAGON ENCOUNTER --- //
+// --- FROST UI CONTROL --- //
+function spreadFrost(enraged = false) {
+    const frost = document.getElementById("frost-overlay");
+    if (!frost) return;
 
+    frost.classList.add("active");
+    if (enraged) frost.classList.add("enraged");
+}
+
+function clearFrost() {
+    const frost = document.getElementById("frost-overlay");
+    if (!frost) return;
+
+    frost.classList.remove("active");
+    frost.classList.remove("enraged");
+}
+
+// --- DRAGON ENCOUNTER --- //
 function dragonEncounter() {
     changeImage("Images/dragonencounter.png");
     dragonTurn = 0;
     clearChoices();
-    writeLog("The Dragon has appeared!", "warn");
-    writeStory("The cavern floor doesn't just tremble; it heaves. As you reach for the scattered riches, a mountain of silver-frosted scales shifts beneath the gold. With a sound like a glacier splintering, the Frost Dragon uncoils, rising from the hoard like a nightmare made of diamond and spite.");
 
-setTimeout(() => { //animation
-        addContinue(dragonBattle);
-    }, 50);
+    writeLog("The Dragon has appeared!", "warn");
+
+    writeStory(
+        "The cavern floor heaves violently. Gold avalanches aside as something ancient stirs beneath it.<br>" +
+        "With a sound like a glacier breaking, the <b>Frost Dragon</b> rises—its breath turning the air to ice."
+    );
+
+    addContinue(dragonBattle);
 }
 
-// --- DRAGON BATTLE --- //
-
+// --- DRAGON BATTLE LOOP --- //
 function dragonBattle() {
     changeImage("Images/dragonfight.png");
+
     if (player.health <= 0) {
-        return gameOver("The summit, once a place of gleaming promise, becomes your altar of sacrifice. You fought with the desperation of a mortal defying a god, but the Frost Dragon is not merely a beast—it is the winter’s fury given flesh and scale. Your journey ends here, frozen in time.");
-    }
-    if (dragonHP <= 0) {
-        writeLog("SLAYED THE FROST DRAGON", "gain");
-        writeStory("With one final, desperate thrust, you find a gap in the dragon's armor. The beast lets out a sky-shaking roar before collapsing, its crystalline body shattering into a thousand shimmering shards.");
-        return ending();
+        clearFrost();
+        return gameOver(
+            "Winter claims you. Your body becomes another frozen relic in the dragon’s hoard."
+        );
     }
 
-// --- DRAGON SPECIAL ATTACK --- //
+    if (dragonHP <= 0) {
+        clearFrost();
+        writeLog("SLAYED THE FROST DRAGON", "gain");
+        writeStory(
+            "Your final strike finds a weakness beneath the dragon’s jaw. With a sky-shattering roar, " +
+            "the Frost Dragon collapses—its body exploding into a storm of crystalline ice."
+        );
+        return ending();
+    }
 
     dragonTurn++;
     clearChoices();
 
-    let isSpecialAttack = (dragonTurn % 3 === 0);
+    const isSpecialAttack = dragonTurn % 3 === 0;
+    const enraged = dragonHP < 50;
     let dragonAction = "";
 
     if (isSpecialAttack) {
-        dragonAction = "<b style='color:#82aaff'>The dragon is inhaling deeply... Frost is forming around its jaws!</b>";
+        dragonAction =
+            "<b style='color:#82aaff'>The dragon inhales deeply. Frost spirals toward its jaws!</b>";
         changeImage("Images/dragonWhileSpe1.png");
-    } else if (dragonHP < 50) {
-        dragonAction = "<b style='color:#ff5555'>The dragon is enraged! It's preparing a massive tail sweep!</b>";
+        spreadFrost(enraged);
     } else {
-        dragonAction = "The dragon looms over you, its claws scraping against the icy stone.";
+        clearFrost();
+        if (enraged) {
+            dragonAction =
+                "<b style='color:#ff5555'>The dragon is enraged! Its movements shake the mountain!</b>";
+        } else {
+            dragonAction =
+                "The dragon looms above you, claws scraping ice as freezing mist coils around its body.";
+        }
     }
 
-    // --- player attack branches --- //
+    writeStory(`
+        <b>[TURN ${dragonTurn}]</b><br>
+        ${dragonAction}<br><br>
+        <span id="dragon-hp" class="dragon-hp-frost">
+                 Dragon HP: ${dragonHP}
+        </span>
+        &nbsp;|&nbsp;
+                 Your HP: ${player.health}
+    `);
 
-    writeStory(`<b>[TURN ${dragonTurn}]</b><br>${dragonAction}<br>Dragon HP: ${dragonHP} | Your HP: ${player.health}`);
+    // Intensify HP visuals when enraged
+    setTimeout(() => {
+        const hpEl = document.getElementById("dragon-hp");
+        if (!hpEl) return;
 
+        if (enraged) {
+            hpEl.style.borderColor = "#ff5555";
+            hpEl.style.boxShadow = "0 0 22px rgba(255,85,85,1)";
+        }
+    }, 0);
+
+    // --- ALL-OUT ATTACK --- //
     addChoice("All-Out Attack", () => {
         let dmg = 5;
-        let msg = "You punch the dragon's scales! It barely even notices."; /* if the player has no sword*/
+        let msg = "You strike bare-handed. The dragon barely reacts.";
 
-        if (player.inventory.includes("Steel Sword +1")) { dmg = 45; msg = "Your enchanted Oakhaven Steel cleaves deep!"; }
-        else if (player.inventory.includes("Steel Sword")) { dmg = 30; msg = "Your Steel Sword bites into its hide!"; }
-        else if (player.inventory.includes("Reforged Blade")) { dmg = 25; msg = "The reforged blade strikes true!"; }
-        else if (player.inventory.includes("Rusty Sword")) {
+        if (player.inventory.includes("Steel Sword +1")) {
+            dmg = 45; msg = "Your enchanted blade carves deep into frozen scales!";
+        } else if (player.inventory.includes("Steel Sword")) {
+            dmg = 30; msg = "Your steel sword bites hard!";
+        } else if (player.inventory.includes("Reforged Blade")) {
+            dmg = 25; msg = "The reforged blade strikes true!";
+        } else if (player.inventory.includes("Rusty Sword")) {
             if (Math.random() < 0.15) {
                 player.inventory = player.inventory.filter(i => i !== "Rusty Sword");
-                dmg = 0; msg = "<b style='color:#ff5555'>Your Rusty Sword shatters against the scales!</b>";
-            } else { dmg = 15; msg = "The rusty blade scrapes the dragon!"; }
+                dmg = 0;
+                msg = "<b style='color:#ff5555'>Your Rusty Sword SHATTERS!</b>";
+            } else {
+                dmg = 15;
+                msg = "The rusty blade scrapes across the ice-hard scales!";
+            }
         }
 
-        let taken = isSpecialAttack ? 40 : 20;
+        const taken = isSpecialAttack ? 40 : 20;
+
         dragonHP -= dmg;
         player.health -= taken;
 
         writeStory(`${msg} (${dmg} DMG)`);
         writeLog(`Dealt ${dmg} DMG`, "gain");
         writeLog(`Took ${taken} DMG`, "loss");
+
         updateUI();
         dragonBattle();
     });
 
-    // --- Dodge and Counter Branch --- //
-
+    // --- DODGE & COUNTER --- //
     addChoice("Dodge and Counter", () => {
         let taken = 0;
         let counterDmg = 10;
-        let logMsg = "";
 
         if (isSpecialAttack) {
-            // High dodge chance (80%) during special attack
-            if (Math.random() < 0.80) {
+            if (Math.random() < 0.8) {
                 taken = 0;
-                logMsg = "Perfect Dodge! 0 DMG taken";
-                changeImage("Images/dragonDoSpe1.png");
-                writeStory("As the dragon unleashes a torrent of frost, you dive behind a jagged rock! The ice misses you completely.");
+                writeStory(
+                    "The dragon unleashes its frost breath—but you dive behind jagged stone as ice detonates past you!"
+                );
+                writeLog("Perfect Dodge!", "gain");
                 changeImage("Images/dragonDoSpe1.png");
             } else {
-                changeImage("Images/dragonDoSpe1.png");
-                taken = 15; // Penalty for failing a high-stakes dodge
-                logMsg = "Dodge failed! Took 15 DMG";
-                writeStory("You try to dive away, but the frost breath catches your cloak!");
+                taken = 15;
+                writeStory("The frost clips you, freezing your armor solid!");
+                writeLog("Dodge Failed — 15 DMG", "loss");
             }
         } else {
-            // Normal turn dodge (original logic)
             taken = 10;
-            logMsg = "Dodged! Only took 10 DMG";
-            writeStory("You roll beneath the dragon's strike, delivering a quick counter-blow as you move.");
+            writeStory(
+                "You roll beneath the dragon’s strike and slash as you pass."
+            );
+            writeLog("Dodged — 10 DMG", "loss");
         }
 
         player.health -= taken;
         dragonHP -= counterDmg;
 
-        writeLog(logMsg, taken === 0 ? "gain" : "loss");
         writeLog(`Countered for ${counterDmg} DMG`, "gain");
         updateUI();
         dragonBattle();
     });
 
-    // --- Use Gem Branch --- //
-
+    // --- DRAGON SOUL GEM --- //
     if (player.inventory.includes("Dragon Soul Gem")) {
-        addChoice("Use Dragon Soul Gem", () => {
-            writeStory("The Gem in your pack pulses with blinding light! It drains the dragon's heat.");
+        addChoice("Unleash Dragon Soul Gem", () => {
+            writeStory(
+                "The Dragon Soul Gem erupts with blinding light, ripping the heat from the dragon’s core!"
+            );
+
             dragonHP -= 60;
-            player.gemUsed = true; 
+            player.gemUsed = true;
             player.inventory = player.inventory.filter(i => i !== "Dragon Soul Gem");
-            writeLog("Gem unleashed! 60 DMG", "gain");
+
+            writeLog("Dragon Soul Gem Unleashed — 60 DMG", "gain");
             updateUI();
             dragonBattle();
         });
     }
 }
+
 
 // --- ENDING & GAME OVER --- //
 
@@ -755,5 +817,8 @@ function introCinematic() {
         addContinue(startGame);
     }, 800);
 }
+
+// Auto-start the game after the DOM is ready
+window.addEventListener('DOMContentLoaded', initGame);
 
 initGame();

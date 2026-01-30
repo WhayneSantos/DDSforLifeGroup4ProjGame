@@ -2,34 +2,40 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>RPG Adventure</title>
+    <title>Life in Adventure</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
-    
-    <div id="chapter-overlay" class="chapter-hidden">
-    <h1 id="chapter-title-text"></h1>
-</div>
 
-<div class="main-wrapper">
-    <div class="game-container">
-        <div class="stats-bar">
-            HP: <span id="hp">100</span>
-            Gold: <span id="gold">15</span>
-            Rep: <span id="rep">0</span>
-        </div>
-        <div id="game-text" class="text-display"></div>
-        <div id="choices" class="button-grid"></div>
+<body>
+    <div id="frost-overlay"></div>
+
+    <div id="chapter-overlay" class="chapter-hidden">
+        <h1 id="chapter-title-text"></h1>
     </div>
-    
-    <div class="image-sidebar">
-        <div class="log-window" id="system-log"></div>
-        <div class="image-frame">
-            <img id="scene-image" src="Images/intro.png" alt="Scene">
+
+    <div class="main-wrapper">
+        <div class="game-container">
+            <div class="stats-bar" id="stats">
+                <div>HP: <span id="hp">100</span></div>
+                <div>Gold: <span id="gold">0</span></div>
+                <div>Reputation: <span id="rep">0</span></div>
+            </div>
+
+            <div class="text-display" id="game-text"></div>
+
+            <div class="button-grid" id="choices"></div>
+        </div>
+
+        <div class="image-sidebar">
+            <div class="image-frame">
+                <img id="scene-image" src="" alt="Scene Image">
+            </div>
+
+            <div class="log-window" id="system-log"></div>
         </div>
     </div>
-</div>
-    
+
     <script src="object.js"></script>
 </body>
 </html>
